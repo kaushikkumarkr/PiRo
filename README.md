@@ -35,38 +35,45 @@ The platform has been trained and validated on the **Soft Drinks (SDR)** categor
 
 ## 3. System Architecture
 
-The system follows a modular "Lakehouse" design, separating data engineering, science, and serving.
-
 ```mermaid
 graph TD
-    subgraph "Ingestion & Warehouse"
-        I["Ingest Scripts"] -->|Pandas| DB[("Postgres DWH")]
-        DB -->|dbt| M["Marts / Features"]
+    subgraph "Core Data Platform (Docker)"
+        I["Ingest"] -->|Load| DB[("Postgres DWH")]
+        DB -->|dbt| M["Feature Marts"]
+        M -->|Sync| FS["Feature Store"]
     end
 
-    subgraph "Science Engine"
-        M -->|Read| E["Elasticity Model (PyMC)"]
-        M -->|Read| F["Forecasting (StatsForecast)"]
-        E -->|Coefficients| S["Simulator"]
-        S -->|Scenarios| O["Optimizer (OR-Tools)"]
+    subgraph "Science Engine (Docker)"
+        FS -->|Read| E["Bayesian Elasticity"]
+        E -->|Matrix| CE["Cross-Elasticity"]
+        F["Forecasting"] -->|Base| S["Optimizer"]
+        S -->|Profit Max| API["FastAPI"]
     end
 
-    subgraph "Serving & UX"
-        O -->|Results| API["FastAPI Service"]
-        M & O -->|BI| D["Metabase Dashboards"]
+    subgraph "MLOps & Verification (Docker)"
+        D["Drift Detector (PSI)"] -->|Alert| AIR["Airflow DAG"]
+        SYN["Synthetic Control"] -->|Validate| EXP[("Experiment Registry")]
+    end
+
+    subgraph "Host Metal (Apple Silicon)"
+        LLM["MLX Co-Pilot (Llama 3.2)"] <-->|RAG| DB
     end
 ```
 
 ### Component Breakdown
-1.  **Ingestion Layer**: Python pipelines load raw Stata/CSV files into Postgres `raw` schema.
-2.  **Transformation Layer (dbt)**: 
-    -   Cleans and normalizes data into a Star Schema (`dim_upc`, `fact_movement`).
-    -   Generates ML features (`log_price`, `lag_sales`) in `marts`.
-3.  **Science Engine**:
-    -   **Elasticity**: PyMC Hierarchical Log-Log Model.
-    -   **Forecasting**: StatsForecast (AutoARIMA) for baseline demand.
-    -   **Optimization**: Google OR-Tools (SCIP Solver) for constrained optimization.
-4.  **Serving Layer**: FastAPI provides REST endpoints for real-time integration.
+1.  **Core Platform**:
+    -   **warehouse**: Postgres 15 + dbt (Star Schema).
+    -   **feature_store**: Point-in-Time correct features for training/serving consistency.
+2.  **Science Engine**:
+    -   **Elasticity**: PyMC Hierarchical Log-Log (Own & Cross Elasticity).
+    -   **Optimization**: MIP Solver (SCIP) penalizing cannibalization.
+3.  **MLOps**:
+    -   **Drift**: PSI-based monitoring (`ml/ops/drift.py`).
+    -   **Experiments**: Synthetic Control Engine (`ml/experimentation`).
+    -   **Automation**: Airflow DAGs (`dags/`).
+4.  **GenAI Agent**:
+    -   **Local**: Python 3.11 (`.venv_mlx`) running on Metal Performance Shaders (MPS).
+    -   **Model**: Quantized Llama-3.2-3B for RAG-based pricing explanation.
 
 ---
 
@@ -112,9 +119,20 @@ graph TD
     ```
 
 ### API Endpoints
--   `GET /health`: System check.
--   `POST /v1/elasticity/lookup`: Get elasticity for a specific UPC/Store.
 -   `GET /v1/optimize/sdr`: Get list of recommended price changes.
+
+### 🍎 Mac M1/M2/M3 Setup (Native GLM)
+To run the GenAI Co-Pilot with hardware acceleration:
+1.  **Create venv**:
+    ```bash
+    python3 -m venv .venv_mlx
+    source .venv_mlx/bin/activate
+    pip install mlx-lm sqlalchemy psycopg2-binary
+    ```
+2.  **Run Agent**:
+    ```bash
+    python ml/copilot/agent.py --query "Why did we hike the price of Coke?"
+    ```
 
 ---
 
