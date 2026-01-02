@@ -40,20 +40,20 @@ The system follows a modular "Lakehouse" design, separating data engineering, sc
 ```mermaid
 graph TD
     subgraph "Ingestion & Warehouse"
-        I[Ingest Scripts] -->|Pandas| DB[(Postgres DWH)]
-        DB -->|dbt| M[Marts / Features]
+        I["Ingest Scripts"] -->|Pandas| DB[("Postgres DWH")]
+        DB -->|dbt| M["Marts / Features"]
     end
 
     subgraph "Science Engine"
-        M -->|Read| E[Elasticity Model (PyMC)]
-        M -->|Read| F[Forecasting (StatsForecast)]
-        E -->|Coefficients| S[Simulator]
-        S -->|Scenarios| O[Optimizer (OR-Tools)]
+        M -->|Read| E["Elasticity Model (PyMC)"]
+        M -->|Read| F["Forecasting (StatsForecast)"]
+        E -->|Coefficients| S["Simulator"]
+        S -->|Scenarios| O["Optimizer (OR-Tools)"]
     end
 
     subgraph "Serving & UX"
-        O -->|Results| API[FastAPI Service]
-        M & O -->|BI| D[Metabase Dashboards]
+        O -->|Results| API["FastAPI Service"]
+        M & O -->|BI| D["Metabase Dashboards"]
     end
 ```
 
