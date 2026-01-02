@@ -1,6 +1,6 @@
 # PIRO: Price Intelligence & Revenue Optimization Platform
 
-**Status**: Completed (Sprint 6)
+**Status**: Completed (Sprint 10 - Final)
 
 PIRO is an industry-grade pricing engine leveraging the **Dominick's Finer Foods (DFF)** dataset (provided by the Kilts Center for Marketing). It implements a modern Lakehouse architecture with Bayesian Elasticity Modeling, Probabilistic Forecasting, and Constraint-Based Optimization to deliver actionable pricing recommendations.
 
@@ -107,7 +107,16 @@ graph TD
     docker compose exec runner python ml/simulation/scenario_engine.py --category sdr
     ```
 
-4.  **Run Optimization**:
+4.  **Run MLOps Pipeline**:
+    ```bash
+    # Check for Data Drift
+    docker compose exec runner python ml/ops/drift.py --train_start 1990-01-01 --serve_end 1993-01-01
+
+    # Register Experiment (Synthetic Control)
+    docker compose exec runner python ml/experimentation/register_experiment.py --name "Test 1" --hypothesis "Price Hike" --store 9
+    ```
+
+5.  **Run Optimization**:
     ```bash
     # Find profit-maximizing prices
     docker compose exec runner python ml/optimization/optimize_profit.py --category sdr
@@ -119,6 +128,8 @@ graph TD
     ```
 
 ### API Endpoints
+-   `GET /health`: System check.
+-   `POST /v1/elasticity/lookup`: Get elasticity for a specific UPC/Store.
 -   `GET /v1/optimize/sdr`: Get list of recommended price changes.
 
 ### 🍎 Mac M1/M2/M3 Setup (Native GLM)
@@ -142,8 +153,11 @@ To run the GenAI Co-Pilot with hardware acceleration:
 -   **Database**: PostgreSQL 15
 -   **Transformation**: dbt Core 1.7
 -   **Machine Learning**:
-    -   **PyMC**: Bayesian Inference.
+    -   **PyMC**: Bayesian Inference (Elasticity).
     -   **StatsForecast**: Efficient Time Series Forecasting.
     -   **OR-Tools**: Operations Research / Optimization.
+    -   **Scikit-Learn**: Synthetic Control / Lasso Regression.
+    -   **MLX**: Apple Silicon Accelerated LLM Inference.
 -   **Serving**: FastAPI, Uvicorn.
+-   **Orchestration**: Apache Airflow.
 -   **Infrastructure**: Docker, Docker Compose, MinIO (S3-compatible storage).
