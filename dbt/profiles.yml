@@ -4,8 +4,8 @@ piro_dbt:
     dev:
       type: postgres
       host: "{{ env_var('POSTGRES_HOST', 'postgres') }}"
-      user: "{{ env_var('POSTGRES_USER', 'admin') }}"
-      password: "{{ env_var('POSTGRES_PASSWORD', 'admin') }}"
+      user: "{{ env_var('POSTGRES_USER') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
       port: 5432
       dbname: "{{ env_var('POSTGRES_DB', 'piro_db') }}"
       schema: public
