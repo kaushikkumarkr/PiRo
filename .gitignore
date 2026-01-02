@@ -32,3 +32,4 @@ metabase.db/*.db
 
 # Outputs
 *.log
+.venv_mlx/
