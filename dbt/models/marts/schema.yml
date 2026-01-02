@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: dim_calendar
+    columns:
+      - name: week_id
+        tests:
+          - unique
+          - not_null
+      - name: start_date
+        tests:
+          - not_null
+
+  - name: dim_upc
+    columns:
+      - name: upc_id
+        tests:
+          - unique
+          - not_null
+      - name: category_id
+        tests:
+          - accepted_values:
+              values: ['sdr', 'cer', 'lnd', 'sna']
+
+  - name: fact_movement_weekly
+    tests:
+      - unique:
+          column_name: "(store_id || '-' || upc_id || '-' || week_id)"
+    columns:
+      - name: store_id
+        tests:
+          - not_null
+      - name: upc_id
+        tests:
+          - not_null
+      - name: week_id
+        tests:
+          - not_null
+      - name: price
+        tests:
+          - not_null
+      - name: sales_units
+        tests:
+          - not_null
+
+  - name: mart_weekly_pricing_features
+    columns:
+      - name: log_price
+        tests:
+          - not_null

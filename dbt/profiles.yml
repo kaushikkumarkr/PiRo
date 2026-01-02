@@ -1,0 +1,13 @@
+piro_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('POSTGRES_HOST', 'postgres') }}"
+      user: "{{ env_var('POSTGRES_USER', 'admin') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'admin') }}"
+      port: 5432
+      dbname: "{{ env_var('POSTGRES_DB', 'piro_db') }}"
+      schema: public
+      threads: 4
+      keepalives_idle: 0

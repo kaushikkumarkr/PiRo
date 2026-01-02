@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: piro_raw
+    schema: public
+    tables:
+      - name: raw_ccount
+        description: "Daily store traffic counts from Stata file"
+      - name: raw_demo
+        description: "Store demographics from Stata file"
+      # Soft Drinks
+      - name: raw_upc_sdr
+        description: "UPC metadata for Soft Drinks"
+      - name: raw_wsdr
+        description: "Weekly movement data for Soft Drinks"
+      # Cereals
+      - name: raw_upc_cer
+        description: "UPC metadata for Cereals"
+      - name: raw_wcer
+        description: "Weekly movement data for Cereals"
+      # Laundry Determinants
+      - name: raw_upc_lnd
+        description: "UPC metadata for Laundry"
+      - name: raw_wlnd
+        description: "Weekly movement data for Laundry"
+      # Snacks
+      - name: raw_upc_sna
+        description: "UPC metadata for Snacks"
+      - name: raw_wsna
+        description: "Weekly movement data for Snacks"
